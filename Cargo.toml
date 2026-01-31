@@ -1,0 +1,15 @@
+[package]
+name = "preset"
+version = "0.1.0"
+edition = "2024"
+authors = ["VG-dev1 <vitohackergrgic@gmail.com>"]
+description = "Save and run command presets"
+license = "MIT"
+repository = "https://github.com/VG-dev1/preset"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+colored = "2.0"
+dirs-next = "2"
