@@ -7,7 +7,7 @@ description = "Save and run command presets"
 license = "MIT"
 repository = "https://github.com/VG-dev1/preset"
 readme = "README.md"
-keywords = ["rust", "cli", "command-line", "automation", "tool", "terminal", "presets"]
+keywords = ["rust", "cli", "command-line", "automation", "tool"]
 categories = ["development-tools"]
 
 [dependencies]
