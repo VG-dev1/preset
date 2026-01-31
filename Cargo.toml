@@ -1,6 +1,6 @@
 [package]
 name = "preset"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["VG-dev1 <vitohackergrgic@gmail.com>"]
 description = "Save and run command presets"
