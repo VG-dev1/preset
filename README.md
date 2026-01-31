@@ -1,6 +1,12 @@
 # preset
 
+[![Version info](https://img.shields.io/crates/v/preset.svg)](https://crates.io/crates/preset)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/preset)
+![Crates.io License](https://img.shields.io/crates/l/preset)
+
 `preset` is a program for managing and running command sequences at once, so you don't have to manually type your commands - just append them to your preset and run your preset.
+
+[Installation](#installation) • [Usage](#usage)
 
 ## Features
 - Create, delete and manage your presets
@@ -8,6 +14,10 @@
 - Placeholders for flexible values (user input)
 - JSON saving
 - Debugging messages
+
+## Demo
+
+![Demo](assets/demo.gif)
 
 ## Usage
 
@@ -47,7 +57,7 @@ preset run "test"
 You can also disable debugging messages using the `--no-message` flag.
 
 > [!NOTE]
-> If a command returns none-zero, the preset will crash. To keep the preset running despite a failed command, use the `--skip-errors` flag.
+> If a command returns non-zero, the preset will crash. To keep the preset running despite a failed command, use the `--skip-errors` flag.
 
 ### Remove commands
 
@@ -81,6 +91,14 @@ preset list
 ```
 
 This prints the JSON where all of your created presets are saved.
+
+### Installation
+
+#### From source
+
+```bash
+cargo install preset
+```
 
 ## Licence
 
