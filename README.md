@@ -1,6 +1,7 @@
 # preset
 
 [![Version info](https://img.shields.io/crates/v/preset.svg)](https://crates.io/crates/preset)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/VG-dev1/preset/rust.yml)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/preset)
 ![Crates.io License](https://img.shields.io/crates/l/preset)
 
