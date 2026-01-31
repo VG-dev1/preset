@@ -6,6 +6,9 @@ authors = ["VG-dev1 <vitohackergrgic@gmail.com>"]
 description = "Save and run command presets"
 license = "MIT"
 repository = "https://github.com/VG-dev1/preset"
+readme = "README.md"
+keywords = ["rust", "cli", "command-line", "automation", "tool", "terminal", "presets"]
+categories = ["development-tools"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
