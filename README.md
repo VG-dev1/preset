@@ -27,7 +27,7 @@
 Your first step is to create your preset. You can do that by running `preset create`, followed by your preset's name:
 
 ```bash
-preset create "test"
+preset create test
 ```
 
 ### Append commands
@@ -35,8 +35,8 @@ preset create "test"
 After creating a preset, you need to add your commands to it. You can do that by running `preset append`, followed by your preset's name and a command:
 
 ```bash
-preset append "test" "echo Hi!"
-preset append "test" "echo This is a test!"
+preset append test echo Hi!
+preset append test echo This is a test!
 ```
 
 #### Placeholders
@@ -44,7 +44,7 @@ preset append "test" "echo This is a test!"
 Normally, the appended commands's value is fixed (e.g. `echo Hi!`). You can make a value flexible (make a preset ask for input when it reaches that command) by adding a placeholder `{}`:
 
 ```bash
-preset append "test" "echo {}"
+preset append test echo {}
 ```
 
 ### Run a preset
@@ -52,10 +52,12 @@ preset append "test" "echo {}"
 Finally, you can run your preset by running `preset run`, followed by your preset's name:
 
 ```bash
-preset run "test"
+preset run test
 ```
 
 You can also disable debugging messages using the `--no-message` flag.
+
+And, you can preview what would be ran without actually running commands using the `--dry-run` flag.
 
 > [!NOTE]
 > If a command returns non-zero, the preset will crash. To keep the preset running despite a failed command, use the `--skip-errors` flag.
@@ -65,7 +67,7 @@ You can also disable debugging messages using the `--no-message` flag.
 You can remove a specific command from your preset by running `preset remove`, followed by your preset's name and a command:
 
 ```bash
-preset remove "test" "echo Hi!"
+preset remove test echo Hi!
 ```
 
 ### Pop commands at a given index
@@ -73,7 +75,7 @@ preset remove "test" "echo Hi!"
 You can pop a command from your preset at a given index by running `preset pop`, followed by your preset's name and an index:
 
 ```bash
-preset pop "test" 0
+preset pop test 0
 ```
 
 ### Insert commands
@@ -81,7 +83,7 @@ preset pop "test" 0
 You can insert a command at a given index by running `preset insert`, followed by your preset's name, index and command:
 
 ```bash
-preset insert "test" 0 "echo Hi!"
+preset insert test 0 echo Hi!
 ```
 
 ### Listing presets
@@ -91,7 +93,7 @@ You can see all of your created presets by running `preset list`:
 preset list
 ```
 
-This prints the JSON where all of your created presets are saved.
+This prints the pretty JSON where all of your created presets are saved.
 
 ### Installation
 
