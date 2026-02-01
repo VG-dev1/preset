@@ -18,36 +18,43 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Create a new preset
     Create { name: String },
-    /// Append a command to a preset
-    Append { name: String, command: String },
-    /// Insert a command at a specific index in a preset
-    Insert { name: String, index: usize, command: String },
-    /// Remove a command from a preset
+
+    Append {
+        name: String,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        command: Vec<String>,
+    },
+
+    Insert {
+        name: String,
+        index: usize,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        command: Vec<String>,
+    },
+
     Remove { name: String, command: String },
-    /// Pop a command at a given index in a preset
+
     Pop { name: String, index: usize },
-    /// Delete a command in a preset
+
     Delete { name: String },
-    /// Run a preset
+
     Run {
         name: String,
         #[arg(long)]
-        /// Continue executing a preset if a command returns non-zero
         skip_errors: bool,
         #[arg(long)]
-        /// Don't show debugging messages
         no_message: bool,
+        #[arg(long)]
+        dry_run: bool,
     },
-    /// List all the created presets
+
     List,
 }
 
 fn get_storage_path() -> PathBuf {
     let home = home_dir().expect("Could not find home directory");
-    let file = home.join("presets.json");
-    file
+    home.join("presets.json")
 }
 
 fn setup_storage() {
@@ -84,21 +91,25 @@ fn main() {
                 println!("Preset '{}' created.", name);
             }
         }
+
         Commands::Append { name, command } => {
             let mut data = load_data();
             if let Some(list) = data.get_mut(&name) {
-                list.push(command);
+                let cmd = command.join(" ");
+                list.push(cmd);
                 save_data(&data);
                 println!("Added to '{}'.", name);
             } else {
                 println!("error: Invalid preset name.");
             }
         }
+
         Commands::Insert { name, index, command } => {
             let mut data = load_data();
             if let Some(list) = data.get_mut(&name) {
                 if index <= list.len() {
-                    list.insert(index, command);
+                    let cmd = command.join(" ");
+                    list.insert(index, cmd);
                     save_data(&data);
                     println!("Inserted to '{}'.", name);
                 } else {
@@ -108,6 +119,7 @@ fn main() {
                 println!("error: Invalid preset name.");
             }
         }
+
         Commands::Remove { name, command } => {
             let mut data = load_data();
             if let Some(list) = data.get_mut(&name) {
@@ -122,6 +134,7 @@ fn main() {
                 println!("error: Invalid preset name.");
             }
         }
+
         Commands::Pop { name, index } => {
             let mut data = load_data();
             if let Some(list) = data.get_mut(&name) {
@@ -136,6 +149,7 @@ fn main() {
                 println!("error: Invalid preset name.");
             }
         }
+
         Commands::Delete { name } => {
             let mut data = load_data();
             if data.remove(&name).is_some() {
@@ -145,7 +159,8 @@ fn main() {
                 println!("error: Invalid preset name.");
             }
         }
-        Commands::Run { name, skip_errors, no_message } => {
+
+        Commands::Run { name, skip_errors, no_message, dry_run } => {
             let data = load_data();
             let commands = match data.get(&name) {
                 Some(c) => c,
@@ -161,8 +176,12 @@ fn main() {
 
             for cmd_orig in commands {
                 let mut cmd = cmd_orig.clone();
+
                 while cmd.contains("{}") {
-                    print!("{}", format!("Enter value for the placeholder in '{}': ", cmd_orig ).yellow());
+                    print!(
+                        "{}",
+                        format!("Enter value for the placeholder in '{}': ", cmd_orig).cyan()
+                    );
                     io::stdout().flush().unwrap();
                     let mut input = String::new();
                     io::stdin().read_line(&mut input).unwrap();
@@ -170,48 +189,56 @@ fn main() {
                 }
 
                 if !no_message {
-                    println!("{}", format!("Executing: {}", cmd).bright_green());
-                }
-
-                #[allow(unused_variables)]
-                let status = if cfg!(target_os = "windows") {
-                    Command::new("cmd")
-                        .arg("/C")
-                        .arg(&cmd)
-                        .status()
-                } else {
-                    Command::new("sh")
-                        .arg("-c")
-                        .arg(&cmd)
-                        .status()
-                };
-
-                if status.is_err() || !status.as_ref().unwrap().success() {
-                    fail += 1;
-                    if !no_message {
-                        if !skip_errors {
-                            println!("{}", "error: Command failed. Stopping.".red());
-                            println!(
-                                "{}",
-                                format!(
-                                    "Execution partially completed: {} commands executed succesfully, {} commands failed.",
-                                    success, fail
-                                ).yellow()
-                            );
-                            exit(1);
-                        } else {
-                            println!("{}", "warning: Command failed. Skipping...".yellow());
-                        }
+                    if !dry_run {
+                        println!("{}", format!("Executing: {}", cmd).bright_green());
+                    } else {
+                        println!("{}", format!("{} would be executed", cmd).cyan());
                     }
-                } else {
-                    success += 1;
                 }
 
-                if success + fail == total && !no_message {
-                    println!("{}", format!("Execution completed: {} commands executed succesfully, {} commands failed.", success, fail).bright_green());
+                if !dry_run {
+                    let status = if cfg!(target_os = "windows") {
+                        Command::new("cmd").arg("/C").arg(&cmd).status()
+                    } else {
+                        Command::new("sh").arg("-c").arg(&cmd).status()
+                    };
+
+                    if status.is_err() || !status.as_ref().unwrap().success() {
+                        fail += 1;
+                        if !no_message {
+                            if !skip_errors {
+                                println!("{}", "error: Command failed. Stopping.".red());
+                                println!(
+                                    "{}",
+                                    format!(
+                                        "Execution partially completed: {} commands executed succesfully, {} commands failed.",
+                                        success, fail
+                                    )
+                                    .yellow()
+                                );
+                                exit(1);
+                            } else {
+                                println!("{}", "warning: Command failed. Skipping...".yellow());
+                            }
+                        }
+                    } else {
+                        success += 1;
+                    }
+
+                    if success + fail == total && !no_message {
+                        println!(
+                            "{}",
+                            format!(
+                                "Execution completed: {} commands executed succesfully, {} commands failed.",
+                                success, fail
+                            )
+                            .bright_green()
+                        );
+                    }
                 }
             }
         }
+
         Commands::List => {
             let data = load_data();
             println!("{}", serde_json::to_string_pretty(&data).unwrap());
